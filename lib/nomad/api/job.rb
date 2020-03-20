@@ -49,6 +49,16 @@ module Nomad
       json = client.get("/v1/job/#{CGI.escape(name)}", options)
       return JobVersion.decode(json)
     end
+
+    # Reads the job with the given name.
+    #
+    # @param [String] name The job name (ID).
+    #
+    # @return [JobStop]
+    def stop(name, **options)
+      json = client.delete("/v1/job/#{CGI.escape(name)}", options)
+      return JobStop.decode(json)
+    end
   end
 
   class JobItem < Response
@@ -543,6 +553,12 @@ module Nomad
       return nil if self.payload_raw.nil?
       Base64.decode64(self.payload_raw)
     end
+  end
+
+  class JobStop < Response
+    field :EvalID, as: :eval_id
+    field :EvalCreateIndex, as: :eval_create_index
+    field :JobModifyIndex, as: :job_modify_index
   end
 
   class JobConstraint < Response
