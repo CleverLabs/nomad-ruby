@@ -4,6 +4,7 @@ module Nomad
   module Configurable
     def self.keys
       @keys ||= [
+        :acl_token,
         :address,
         :hostname,
         :open_timeout,

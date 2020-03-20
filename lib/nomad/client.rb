@@ -135,6 +135,7 @@ module Nomad
 
       # Get a list of headers
       headers = DEFAULT_HEADERS.merge(headers)
+      headers = headers.merge({ "X-Nomad-Token" => acl_token }) if acl_token
 
       # Add headers
       headers.each do |key, value|

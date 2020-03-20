@@ -36,6 +36,12 @@ module Nomad
         Hash[*Configurable.keys.map { |key| [key, public_send(key)] }.flatten]
       end
 
+      # ACL token
+      # @return [String, nil]
+      def acl_token
+        ENV["NOMAD_TOKEN"]
+      end
+
       # The address to communicate with Nomad.
       # @return [String]
       def address
