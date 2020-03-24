@@ -85,23 +85,27 @@ module Nomad
 
       # For each supplied option, set the instance variable if it was defined
       # as a field.
-      input.each do |n, v|
-        if self.class.fields.key?(n)
-          opts = self.class.fields[n]
+      input.each do |field_name, variable|
+        if self.class.fields.key?(field_name)
+          opts = self.class.fields[field_name]
 
-          if (m = opts[:load])
-            if m.is_a?(Symbol)
-              v = BUILTIN_LOADERS[m].call(v)
-            else
-              v = m.call(v)
+          if (loader = opts[:load])
+            begin
+              if loader.is_a?(Symbol)
+                variable = BUILTIN_LOADERS[loader].call(variable)
+              else
+                variable = loader.call(variable)
+              end
+            rescue Exception => e
+              raise "Wrong loader for #{field_name.to_s}!. #{e.message}"
             end
           end
 
           if opts[:freeze]
-            v = v.freeze
+            variable = variable.freeze
           end
 
-          instance_variable_set(:"@#{opts[:as]}", v)
+          instance_variable_set(:"@#{opts[:as]}", variable)
         end
       end
     end
