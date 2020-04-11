@@ -142,6 +142,12 @@ module Nomad
         req.add_field(key, value)
       end
 
+      # Add http auth
+      address_uri = URI.parse(address)
+      if address_uri.user && address_uri.password
+        req.basic_auth(address_uri.user, address_uri.password)
+      end
+
       # Setup PATCH/POST/PUT
       if [:patch, :post, :put].include?(verb)
         if data.respond_to?(:read)
