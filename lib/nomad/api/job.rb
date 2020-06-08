@@ -40,6 +40,21 @@ module Nomad
       return JobCreate.decode(json)
     end
 
+    # Invokes a dry-run of the scheduler for the job. The contents can be a string
+    # or a hash.
+    #
+    # @param [String] contents
+    #   the raw JSON contents
+    # @param [Hash] contents
+    #   a hash of the contents to convert to JSON
+    #
+    # @return [JobPlan]
+    def plan(job_id, contents, **options)
+      body = contents.is_a?(Hash) ? JSON.fast_generate(contents) : contents
+      json = client.post("/v1/job/#{job_id}/plan", body, options)
+      return JobPlan.decode(json)
+    end
+
     # Reads the job with the given name.
     #
     # @param [String] name The job name (ID).
@@ -417,6 +432,22 @@ module Nomad
     #   The job known_leader.
     #   @return [Boolean]
     field :KnownLeader, as: :known_leader
+  end
+
+  class JobPlan < Response
+    field :Annotations, as: :annotations, load: ->(item) { JobPlanAnnotations.decode(item) }
+    field :FailedTGAllocs, as: :failed_tg_allocs
+    field :JobModifyIndex, as: :job_modify_index
+    field :CreatedEvals, as: :created_evals
+    field :Diff, as: :diff
+    field :NextPeriodicLaunch, as: :next_periodic_launch
+    field :Warnings, as: :warnings
+    field :Index, as: :index
+  end
+
+  class JobPlanAnnotations < Response
+    field :DesiredTGUpdates, as: :desired_tg_updates
+    field :PreemptedAllocs, as: :preempted_allocs
   end
 
   class JobVersion < Response
